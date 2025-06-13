@@ -1,0 +1,9 @@
+apiVersion: builtin
+kind: HelmChartInflationGenerator
+metadata:
+  name: redis-sentinel
+name: redis-sentinel
+namespace: redis
+releaseName: redis-sentinel
+repo: https://github.com/cyberRuptor/redis-sentinel-helm-chart
+valuesFile: values.yaml

@@ -1,0 +1,13 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: rhsi-redis
+  namespace: openshift-gitops
+spec:
+  destination:
+    cluster:
+    - in-cluster
+    namespaces:
+    - redis
+  sourceRepos:
+    - '*'

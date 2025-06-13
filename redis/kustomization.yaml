@@ -1,5 +1,5 @@
 helmGlobals:
-  chartHome: ../charts/redis-sentinel-helm-chart
+  chartHome: ../charts/
 
 helmCharts:
 - name: redis-sentinel

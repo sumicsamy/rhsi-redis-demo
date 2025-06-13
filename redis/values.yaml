@@ -1,0 +1,6 @@
+redisSentinel:
+  sentinel:
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 26379

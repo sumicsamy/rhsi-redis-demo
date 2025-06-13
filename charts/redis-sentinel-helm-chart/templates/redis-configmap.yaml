@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-redis-config
+  namespace: {{ .Values.namespace }}
+data:
+  redis.conf: |
+    {{ .Values.redisSentinel.redisConfig | nindent 4 }}
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-sentinel-config
+  namespace: {{ .Values.namespace }}
+data:
+  sentinel.conf: |
+    {{ .Values.redisSentinel.sentinelConfig | nindent 4 }}

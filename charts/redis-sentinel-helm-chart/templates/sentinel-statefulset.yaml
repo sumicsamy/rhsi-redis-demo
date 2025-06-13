@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Release.Name }}-redis-sentinel"
+  namespace: {{ .Values.namespace }}
+spec:
+  serviceName: "{{ .Release.Name }}-redis-sentinel-service"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: {{ .Values.redisSentinel.selector.app }}
+      role: {{ .Values.redisSentinel.selector.role3 }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.redisSentinel.selector.app }}
+        role: {{ .Values.redisSentinel.selector.role3 }}
+    spec:
+      containers:
+      - name: {{ .Values.redisSentinel.selector.app }}-{{ .Values.redisSentinel.selector.role3 }}
+        image: {{ .Values.redisSentinel.image.repository }}:{{ .Values.redisSentinel.image.tag }}
+        securityContext:
+          #allowPrivilegeEscalation: {{ .Values.redisSentinel.securityContext.allowPrivilegeEscalation }}
+          #privileged: {{ .Values.redisSentinel.securityContext.privileged }}
+        ports:
+        - containerPort: {{ .Values.redisSentinel.sentinel.service.sentinelPort }}
+        volumeMounts:
+        - name: {{ .Values.redisSentinel.selector.role3 }}-config
+          mountPath: {{ .Values.redisSentinel.sentinel.volumeMounts.configMountPath }}
+          subPath: {{ .Values.redisSentinel.sentinel.volumeMounts.subPath }}
+        - name: password-secret
+          mountPath: {{ .Values.redisSentinel.sentinel.volumeMounts.secretMountPath }}
+          readOnly: {{ .Values.redisSentinel.sentinel.volumeMounts.readOnly }}
+        env:
+         - name: REDIS_PASSWORD
+           valueFrom:
+             secretKeyRef:
+               name: "{{ .Release.Name }}-redis-secret"
+               key: redis-password
+        {{- if .Values.redisSentinel.sentinel.command }}
+        command: {{ .Values.redisSentinel.sentinel.command | toYaml | nindent 10 }}
+        {{- end }}
+        resources:
+          requests:
+            memory: {{ .Values.redisSentinel.sentinel.resources.requests.memory }}
+            cpu: {{ .Values.redisSentinel.sentinel.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.redisSentinel.sentinel.resources.limits.memory }}
+            cpu: {{ .Values.redisSentinel.sentinel.resources.limits.cpu }}
+      volumes:
+      - name: {{ .Values.redisSentinel.selector.role3 }}-config
+        configMap:
+          name: "{{ .Release.Name }}-sentinel-config"
+          items:
+          - key: sentinel.conf
+            path: {{ .Values.redisSentinel.sentinel.volumeMounts.subPath }}
+      - name: password-secret
+        secret:
+          secretName: "{{ .Release.Name }}-redis-secret"
+      serviceAccountName: "{{ .Values.namespace }}-sa"

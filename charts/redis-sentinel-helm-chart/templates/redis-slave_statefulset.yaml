@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-redis-replica
+  namespace: {{ .Values.namespace }}
+spec:
+  serviceName: {{ .Release.Name }}-redis-replica-service
+  replicas: {{ .Values.redisSentinel.slave.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.redisSentinel.selector.app }}
+      role: {{ .Values.redisSentinel.selector.role2 }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.redisSentinel.selector.app }}
+        role: {{ .Values.redisSentinel.selector.role2 }}
+    spec:
+      containers:
+      - name: {{ .Values.redisSentinel.selector.app }}-{{ .Values.redisSentinel.selector.role2 }}
+        image: {{ .Values.redisSentinel.image.repository }}:{{ .Values.redisSentinel.image.tag }}
+        imagePullPolicy: {{ .Values.redisSentinel.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.redisSentinel.slave.service.port }}
+        volumeMounts:
+        - name: {{ .Values.redisSentinel.selector.app }}-data
+          mountPath: /data
+        - name: config
+          mountPath: /usr/local/etc/redis/redis.conf
+          subPath: redis.conf
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-redis-secret
+              key: redis-password
+        {{- if .Values.redisSentinel.slave.command }}
+        command: {{ .Values.redisSentinel.slave.command | toYaml | nindent 10 }}
+        {{- end }}
+        #command: ["sh", "-c", "redis-server /usr/local/etc/redis/redis.conf --replicaof 10.240.35.254 6379 --masterauth ${REDIS_PASSWORD} "]
+        #args: {{ .Values.redisSentinel.slave.args | toJson }}
+        resources:
+          requests:
+            memory: {{ .Values.redisSentinel.master.resources.requests.memory }}
+            cpu: {{ .Values.redisSentinel.master.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.redisSentinel.master.resources.limits.memory }}
+            cpu: {{ .Values.redisSentinel.master.resources.limits.cpu }}
+      volumes:
+      - name: config
+        configMap:
+          name: {{ .Release.Name }}-redis-config
+      serviceAccountName: {{ .Values.namespace }}-sa
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ .Values.redisSentinel.selector.app }}-data
+    spec:
+      accessModes: {{ .Values.redisSentinel.volumeClaimTemplates.accessModes }}
+      resources:
+        requests:
+          storage: {{ .Values.redisSentinel.volumeClaimTemplates.resources.requests.storage }}

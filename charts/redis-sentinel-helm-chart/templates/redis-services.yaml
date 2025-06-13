@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-redis-master-service
+  namespace: {{ .Values.namespace }}
+spec:
+  {{- if eq .Values.redisSentinel.master.service.type "Headless" }}
+  clusterIP: None
+  {{- else if eq .Values.redisSentinel.master.service.type "LoadBalancer" }}
+  type: {{ .Values.redisSentinel.master.service.type }}
+  loadBalancerIP: {{ .Values.redisSentinel.master.service.loadBalancerIP }}
+  {{- else }}
+  clusterIP:
+  {{- end }}
+  ports:
+  - port: {{ .Values.redisSentinel.master.service.port }}
+  selector:
+    app: {{ .Values.redisSentinel.selector.app }}
+    role: {{ .Values.redisSentinel.selector.role1 }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-redis-replica-service
+  namespace: {{ .Values.namespace }}
+spec:
+  {{- if eq .Values.redisSentinel.slave.service.type "Headless" }}
+  clusterIP: None
+  {{- else }}
+  clusterIP:
+  {{- end }}
+  ports:
+  - port: {{ .Values.redisSentinel.slave.service.port }}
+  selector:
+    app: {{ .Values.redisSentinel.selector.app }}
+    role: {{ .Values.redisSentinel.selector.role2 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-redis-sentinel-service
+  namespace: {{ .Values.namespace }}
+spec:
+  {{- if eq .Values.redisSentinel.sentinel.service.type "Headless" }}
+  clusterIP: None
+  {{- else }}
+  clusterIP:
+  {{- end }}
+  ports:
+  - port: {{ .Values.redisSentinel.sentinel.service.sentinelPort }}
+  selector:
+    app: {{ .Values.redisSentinel.selector.app }}
+    role: {{ .Values.redisSentinel.selector.role3 }}

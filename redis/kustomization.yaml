@@ -1,4 +1,11 @@
-generators:
-- helmchart.yaml
+helmGlobals:
+  chartHome: ../charts/redis-sentinel-helm-chart
 
-namespace: redis
+helmCharts:
+- name: redis-sentinel
+  releaseName: redis-sentinel
+  valuesFile: values.yaml
+  namespace: redis
+
+resources:
+- redis-secret.yaml

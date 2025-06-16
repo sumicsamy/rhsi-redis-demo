@@ -1,16 +1,6 @@
-namespace: redis
-redisSentinel:
-  image:
-    repository: bitnami/redis-sentinel
-    tag: 8.0.2-debian-12-r2
-  sentinelConfig: |
-    port 26379
-    sentinel monitor mymaster redis-sentinel-redis-master-service.redis.svc.cluster.local 6379 2
-    sentinel down-after-milliseconds mymaster 5000
-    sentinel parallel-syncs mymaster 1
-    sentinel failover-timeout mymaster 10000  
-  sentinel:
-    service:
-      enabled: true
-      type: ClusterIP
-      port: 26379
+architecture: replication
+sentinel:
+  enabled: true
+auth:
+  enabled: true
+  password: redis-password

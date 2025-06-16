@@ -1,11 +1,11 @@
-helmGlobals:
-  chartHome: ../charts/
+
 
 helmCharts:
-- name: redis-sentinel
+- name: bitnami/redis
   releaseName: redis-sentinel
   valuesFile: values.yaml
-  namespace: redis
+  namespace: redis-sentinel
+  repository: https://charts.bitnami.com/bitnami
 
-resources:
-- redis-secret.yaml
+# resources:
+# - redis-secret.yaml

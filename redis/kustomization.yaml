@@ -1,8 +1,9 @@
 
 
 helmCharts:
-- name: bitnami/redis
+- name: redis
   releaseName: redis-sentinel
+  version: 21.2.3
   valuesFile: values.yaml
   namespace: redis-sentinel
   repo: https://charts.bitnami.com/bitnami

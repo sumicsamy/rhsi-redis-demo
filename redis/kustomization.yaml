@@ -1,10 +1,11 @@
 
 
 helmCharts:
-- name: oci://registry-1.docker.io/bitnamicharts/redis
+- name: redis
   releaseName: redis-sentinel
   valuesFile: values.yaml
   namespace: redis-sentinel
+  repo: oci://registry-1.docker.io/bitnamicharts/
 
 # resources:
 # - redis-secret.yaml

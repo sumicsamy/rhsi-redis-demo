@@ -1,5 +1,6 @@
 architecture: replication
-sentinel.enabled: true
+sentinel:
+  enabled: true
 auth:
   enabled: true
   existing: redis-secret

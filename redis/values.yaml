@@ -1,6 +1,45 @@
 architecture: replication
-sentinel:
-  enabled: true
+sentinel.enabled: true
 auth:
   enabled: true
-  password: redis-password
+  existing: redis-secret
+  sentinel: true
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+    additionalLabels:
+      release: prometheus
+    metricRelabelings:
+      - sourceLabels: [__name__]
+        regex: 'redis_sentinel_(.+)'
+        action: keep
+    additionalEndpoints:   
+      - interval: "30s"
+        path: "/scrape"
+        port: "http-metrics"
+        params:
+          target: ["localhost:26379"]
+        metricRelabelings:
+        - targetLabel: "app"
+          replacement: "sentinel"
+      - interval: "30s"
+        path: "/scrape"
+        port: "http-metrics"
+        params:
+          target: ["localhost:6379"]
+        metricRelabelings:
+        - targetLabel: "app"
+          replacement: "redis"          
+masterService:
+  enabled: true
+externalAccess:
+  enabled: true
+  service:
+    type: LoadBalancer
+    port: 6379
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: nlb
+      service.beta.kubernetes.io/aws-load-balancer-internal: "true"

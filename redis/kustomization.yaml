@@ -1,7 +1,7 @@
 
 
 helmCharts:
-- name: redis-sentinel
+- name: redis
   releaseName: redis-sentinel
   valuesFile: values.yaml
   namespace: redis-sentinel

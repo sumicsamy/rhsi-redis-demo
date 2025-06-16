@@ -5,7 +5,7 @@ helmCharts:
   releaseName: redis-sentinel
   valuesFile: values.yaml
   namespace: redis-sentinel
-  repository: https://charts.bitnami.com/bitnami
+  chartRepoUrl:: https://charts.bitnami.com/bitnami
 
 # resources:
 # - redis-secret.yaml
